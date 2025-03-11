@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Number Login</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .login-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input[type="number"] {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3e8e41;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Manual Number Login</h1>
+        <input type="number" id="loginNumber" placeholder="Enter Number">
+        <button onclick="manualLogin()">Login</button>
+        <p id="message"></p>
+    </div>
+
+    <script>
+        function manualLogin() {
+            let loginNumber = document.getElementById('loginNumber').value;
+            fetch('/manual_login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ number: loginNumber })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let message = document.getElementById('message');
+                if (data.status === 'success') {
+                    message.textContent = data.message;
+                    window.location.href = "/"; // Redirect to main page
+                } else {
+                    message.textContent = data.message;
+                }
+            })
+            .catch(error => {
+                let message = document.getElementById('message');
+                message.textContent = 'Error: ' + error;
+            });
+        }
+    </script>
+</body>
+</html>

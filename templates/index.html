@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synapse AI Chatbot</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #0d0d0d;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            animation: backgroundAnimation 10s infinite alternate;
+        }
+
+        @keyframes backgroundAnimation {
+            0% { background-color: #0d0d0d; }
+            100% { background-color: #1a1a1a; }
+        }
+
+        .chat-container {
+            width: 90%;
+            max-width: 600px;
+            background: #1c1c1e;
+            border-radius: 15px;
+            box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: linear-gradient(90deg, #4a00e0, #8e2de2);
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            position: relative;
+        }
+
+        #chatbox {
+            height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            max-width: 85%;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 15px;
+            animation: fadeIn 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: #4a00e0;
+            color: #fff;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background: #333;
+            color: #eee;
+        }
+
+        .message-actions {
+            display: none;
+            position: absolute;
+            right: -35px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .message:hover .message-actions {
+            display: block;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background: #1c1c1e;
+            border-top: 1px solid #444;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+            background: #333;
+            color: #fff;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background: #4a00e0;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin-left: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #8e2de2;
+        }
+
+        .options {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        /* ChatGPT-like styling */
+        .chat-container {
+            background: #343541;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-header {
+            background: #444654;
+            color: #fff;
+            font-size: 1.5em;
+            padding: 15px;
+            border-bottom: 1px solid #202123;
+        }
+
+        #chatbox {
+            background: #343541;
+            padding: 15px;
+        }
+
+        .message {
+            background: #444654;
+            color: #d1d5db;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            word-break: break-word;
+        }
+
+        .user-message {
+            background: #5d5f73;
+            align-self: flex-end;
+        }
+
+        .bot-message {
+            background: #444654;
+            align-self: flex-start;
+        }
+
+        .chat-input {
+            background: #444654;
+            padding: 15px;
+            border-top: 1px solid #202123;
+        }
+
+        #user-input {
+            background: #343541;
+            color: #d1d5db;
+            border: 1px solid #5d5f73;
+            padding: 10px 15px;
+            border-radius: 5px;
+            width: 80%;
+        }
+
+        button {
+            background: #7c7d92;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #9ca3af;
+        }
+
+        .options {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">Synapse</div>
+        <div id="chatbox"></div>
+        
+        <div class="options">
+            <label><input type="checkbox" id="direct-mode"> Direct Mode (Instant Response)</label>
+            <button onclick="startVoiceRecognition()" style="animation: pulse 2s infinite;">🎤 Voice</button>
+            <style>
+                @keyframes pulse {
+                    0% {
+                        box-shadow: 0 0 0 0 rgba(74, 0, 224, 0.4);
+                    }
+                    70% {
+                        box-shadow: 0 0 0 10px rgba(74, 0, 224, 0);
+                    }
+                    100% {
+                        box-shadow: 0 0 0 0 rgba(74, 0, 224, 0);
+                    }
+                }
+            </style>
+            <button onclick="clearChat()">🗑 Clear Chat</button>
+        </div>
+
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type a message...">
+            <button onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <script>
+        let chatHistory = [];
+
+        function sendMessage() {
+            let userInput = document.getElementById("user-input").value;
+            if (!userInput) return;
+
+            let chatbox = document.getElementById("chatbox");
+
+            let userMessage = document.createElement("div");
+            userMessage.classList.add("message", "user-message");
+            userMessage.innerHTML = `<span>${userInput}</span>`;
+            chatbox.appendChild(userMessage);
+
+            chatHistory.push({ role: "user", content: userInput });
+
+            // Add "Synapse is typing..." effect
+            let botTyping = document.createElement("div");
+            botTyping.classList.add("message", "bot-message", "typing");
+            botTyping.innerHTML = `<span>Synapse is thinking...</span>`;
+            chatbox.appendChild(botTyping);
+
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+            fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: userInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatbox.removeChild(botTyping);
+
+                let botMessage = document.createElement("div");
+                botMessage.classList.add("message", "bot-message");
+                botMessage.innerHTML = `<span>${data.bot}</span>`;
+                chatbox.appendChild(botMessage);
+                chatHistory.push({ role: "assistant", content: data.bot });
+
+                chatbox.scrollTop = chatbox.scrollHeight;
+
+                // Enable speech output
+                let utterance = new SpeechSynthesisUtterance(data.bot);
+                speechSynthesis.speak(utterance);
+            });
+
+            document.getElementById("user-input").value = "";
+        }
+
+        function startVoiceRecognition() {
+            let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-US";
+            recognition.start();
+
+            recognition.onresult = function(event) {
+                let transcript = event.results[0][0].transcript;
+                document.getElementById("user-input").value = transcript;
+                sendMessage();
+            };
+        }
+
+        function clearChat() {
+            document.getElementById("chatbox").innerHTML = "";
+            chatHistory = [];
+        }
+    </script>
+
+</body>
+</html>
